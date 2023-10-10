@@ -65,7 +65,7 @@ if (!process.env.PWD) {
   process.env.PWD = process.cwd();
 }
 
-const { migrationsDir, modelsDir } = pathConfig(options);
+const { migrationsDir, modelsDir, sequelizeConfig } = pathConfig(options);
 
 if (!fs.existsSync(modelsDir)) {
   console.log("Can't find models directory. Use `sequelize init` to create it");
