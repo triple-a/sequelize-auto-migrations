@@ -9,6 +9,7 @@ let pathConfig = require("../lib/pathconfig");
 const fs = require("fs");
 const path = require("path");
 const _ = require("lodash");
+const { Sequelize } = require("sequelize");
 
 const optionDefinitions = [
   {
@@ -99,7 +100,25 @@ try {
 //console.log(path.join(migrationsDir, '_current.json'), JSON.parse(fs.readFileSync(path.join(migrationsDir, '_current.json') )))
 let sequelize = require(modelsDir).sequelize;
 
+if (!sequelize) {
+  sequelize = new Sequelize(
+    sequelizeConfig.database,
+    sequelizeConfig.username,
+    sequelizeConfig.password,
+    sequelizeConfig
+  );
+}
+
 let models = sequelize.models;
+if (!models || Object.entries(models).length === 0) {
+  const modelsModule = require(modelsDir);
+
+  if ("initModels" in modelsModule) {
+    modelsModule.initModels(sequelize);
+  }
+
+  models = sequelize.models;
+}
 
 currentState.tables = migrate.reverseModels(sequelize, models);
 
